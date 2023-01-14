@@ -142,17 +142,21 @@ namespace serious
                 try
                 {
                     port.Open();
+                    OutputLine("----------- port " + portName + " opened & listening... -----------\n");
                     break;
                 }
                 catch (IOException)
                 { /* sometimes happens when the port's not ready */ }
+                catch (UnauthorizedAccessException)
+                {
+                    OutputLine("port " + portName + " is probably already in use. giving up.");
+                    break;
+                }
 
                 Thread.Sleep(200);
             }
 
-            OutputLine("----------- port " + portName + " opened & listening... -----------\n");
-
-            while (true)
+            while (port.IsOpen)
             {
                 try
                 {
@@ -216,11 +220,21 @@ namespace serious
             return false;
         }
 
+        private void UpdateAvailablePorts(string[] ports)
+        {
+            PortNames = String.Join(", ", ports);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("PortNames"));
+                PropertyChanged(this, new PropertyChangedEventArgs("WindowTitle"));
+            }
+        }
+
         private void PortMonitorJob()
         {
             // init
             string[] oldPorts = SerialPort.GetPortNames();
-            PortNames = String.Join(", ", oldPorts);
+            UpdateAvailablePorts(oldPorts);
             ListenToComPorts(oldPorts);
 
             while (true)
@@ -230,14 +244,8 @@ namespace serious
                 string[] currPorts = SerialPort.GetPortNames();
                 if (HavePortsChanged(oldPorts, currPorts))
                 {
+                    UpdateAvailablePorts(currPorts);
                     ListenToComPorts(currPorts);
-
-                    PortNames = String.Join("\n", currPorts);
-                    if (PropertyChanged != null)
-                    {
-                        PropertyChanged(this, new PropertyChangedEventArgs("PortNames"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("WindowTitle"));
-                    }
 
                     oldPorts = currPorts;
                 }
@@ -245,9 +253,9 @@ namespace serious
         }
         #endregion
 
-        private void TextBlock_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void TtyTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TtyScroll.ScrollToBottom();
+            TtyTextBox.ScrollToEnd();
         }
     }
 }

@@ -9,10 +9,7 @@
 
     <Window.Resources>
         <SolidColorBrush x:Key="TerminalBg" Color="#FF212121"/>
-        <SolidColorBrush x:Key="TerminalFg" Color="#FF0E802F"/>
-        <Style x:Key="TerminalFont" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Cascadia Mono, Lucida Console" />
-        </Style>
+        <SolidColorBrush x:Key="TerminalFg" Color="#FF19B345"/>
     </Window.Resources>
     
     <Grid Margin="3,3,3,3">
@@ -20,8 +17,18 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <ScrollViewer Name="TtyScroll" Grid.Row="0">
-            <TextBlock Text="{Binding TTY, Mode=OneWay}" FontFamily="Cascadia Mono, Lucida Console" FontSize="11" Foreground="{StaticResource TerminalFg}" RenderTransformOrigin="0.5,0.5" SizeChanged="TextBlock_SizeChanged" />
-        </ScrollViewer>
+        <TextBox
+            Name="TtyTextBox"
+            Background="Transparent"
+            BorderThickness="0"
+            Text="{Binding TTY, Mode=OneWay}"
+            IsReadOnly="True"
+            FontFamily="Cascadia Mono, Lucida Console"
+            FontSize="11"
+            Foreground="{StaticResource TerminalFg}"
+            TextChanged="TtyTextBox_TextChanged" 
+            AllowDrop="False"
+            VerticalScrollBarVisibility="Hidden"/>
+        
     </Grid>
 </Window>
