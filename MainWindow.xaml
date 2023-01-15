@@ -10,13 +10,71 @@
     <Window.Resources>
         <SolidColorBrush x:Key="TerminalBg" Color="#FF212121"/>
         <SolidColorBrush x:Key="TerminalFg" Color="#FF19B345"/>
+
+
+        <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollBarThumbVertical" TargetType="{x:Type Thumb}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border x:Name="GrabbableThumb" Background="#6019B345" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" CornerRadius="3"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="GrabbableThumb" Value="#FF29d365"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="true">
+                                <Setter Property="Background" TargetName="GrabbableThumb" Value="#FF29d365"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="VerticalScrollBar" TargetType="{x:Type ScrollBar}">
+            <Grid SnapsToDevicePixels="true" Width="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition MaxHeight="1"/>
+                    <RowDefinition Height="0.00001*"/>
+                    <RowDefinition MaxHeight="1"/>
+                </Grid.RowDefinitions>
+                <Track Name="PART_Track" IsDirectionReversed="true" Grid.Row="1">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Style="{StaticResource RepeatButtonTransparent}"/>
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource ScrollBarThumbVertical}" Margin="2"/>
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Style="{StaticResource RepeatButtonTransparent}"/>
+                    </Track.IncreaseRepeatButton>
+                </Track>
+            </Grid>
+        </ControlTemplate>
     </Window.Resources>
     
     <Grid Margin="3,3,3,3">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <TextBox
             Name="TtyTextBox"
             Background="Transparent"
@@ -28,7 +86,18 @@
             Foreground="{StaticResource TerminalFg}"
             TextChanged="TtyTextBox_TextChanged" 
             AllowDrop="False"
-            VerticalScrollBarVisibility="Hidden"/>
-        
+            VerticalScrollBarVisibility="Visible">
+
+            <TextBox.Resources>
+                <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
+                    <Setter Property="SnapsToDevicePixels" Value="True"/>
+                    <Setter Property="OverridesDefaultStyle" Value="true"/>
+                    <Setter Property="Width" Value="10"/>
+                    <Setter Property="Height" Value="Auto" />
+                    <Setter Property="Template"  Value="{StaticResource VerticalScrollBar}" />
+                </Style>
+            </TextBox.Resources>
+        </TextBox>
+
     </Grid>
 </Window>
